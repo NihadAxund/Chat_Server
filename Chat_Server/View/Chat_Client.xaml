@@ -3,20 +3,33 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:Chat_Server.View"
         mc:Ignorable="d"
-        Title="Chat_Client" Height="450" Width="800" MaxHeight="450" MinHeight="450" MaxWidth="800" MinWidth="800">
+        Title="Chat_Client" Height="650" Width="1000" MaxHeight="650" MinHeight="650" MaxWidth="1000" MinWidth="900">
+    <Window.Background>
+        <ImageBrush ImageSource="/View/51439hd.jpg"/>
+    </Window.Background>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="9*" />
             <RowDefinition Height="1.5*" />
         </Grid.RowDefinitions>
-        <ListBox Name="list_box" >
-            
-        </ListBox>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" >
-            <TextBox Name="TXT_BOX" Background="WhiteSmoke" Margin="100,0,0,0"  HorizontalAlignment="Center" Width="500" Height="45"  VerticalAlignment="Center"></TextBox>
-            <Button Width="100" FontSize="18" Height="45" Command="{Binding Send_Btn}" >Send</Button>
+        <ScrollViewer Name="Scrollviwer"  VerticalScrollBarVisibility="Auto">
+            <StackPanel  Orientation="Vertical" Background="Transparent" Name="Chat_list" ></StackPanel>
+
+        </ScrollViewer>
+        <StackPanel Margin="0,0,0,10"  Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" >
+
+            <TextBox Name="TXT_BOX" Width="500" Height="60" Background="#7E09A139" FontSize="15"  Foreground="White" SelectionBrush="#FFCFC19E" 
+                Style="{StaticResource MaterialDesignFilledTextBox}"
+                   
+                    VerticalAlignment="Center"
+                    TextWrapping="Wrap"
+                    MaxLength="80"
+                    materialDesign:TextFieldAssist.CharacterCounterVisibility="Visible"
+                     materialDesign:HintAssist.Hint="SEND MESSAGE . . ."/>
+            <Button Width="100" FontSize="18" Height="60" Command="{Binding Send_Btn}" Background="#B217D252" >Send</Button>
         </StackPanel>
     </Grid>
 </Window>

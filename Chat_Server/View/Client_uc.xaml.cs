@@ -1,4 +1,5 @@
-﻿using Chat_Server.ViewModel;
+﻿using Chat_Server.Model;
+using Chat_Server.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,8 @@ namespace Chat_Server.View
     {
         public ClientConnection TCC {get; set; }
         public int Badge_Count = 0;
+
+
         public void Badge_Count_inc()
         {
             
@@ -43,5 +46,7 @@ namespace Chat_Server.View
             TCC = TC;
             Client_Name_txt.Text = TC.socket.RemoteEndPoint.ToString();
         }
+
+ 
     }
 }

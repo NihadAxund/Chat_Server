@@ -1,4 +1,5 @@
 ﻿using Chat_Server.Command;
+using Chat_Server.Model;
 using Chat_Server.View;
 using System;
 using System.Collections.Generic;
@@ -8,11 +9,13 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection.Emit;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
+using static System.Net.Mime.MediaTypeNames;
 using Label = System.Windows.Controls.Label;
 
 namespace Chat_Server.ViewModel
@@ -21,14 +24,29 @@ namespace Chat_Server.ViewModel
     {
         private ClientConnection _TCP_CLient { get; set; }
         private Chat_Client _CC { get; set; }
+        private Task task { get; set; }
+        public bool IsOKay { get; set; } = true;
         public RelayCommand Send_Btn { get; set; }
-        private void MessageList(List<string> str)
+        private void MessageList(List<MessageString> str)
         {
-            _CC.Dispatcher.Invoke(new Action(() =>
+            _CC.Dispatcher.BeginInvoke(new Action(() =>
             {
                 foreach (var item in str)
                 {
-                    _CC.list_box.Items.Add(item);
+                    if (item.IsSent)
+                    {
+                        var cl = new Server_Label(item.Message);
+                        cl.Margin = new Thickness(10, 0, 0, 0);
+                        cl.HorizontalAlignment = HorizontalAlignment.Right;
+                        _CC.Chat_list.Children.Add(cl);
+                    }
+                    else
+                    {
+                        var cl = new Client_Label(item.Message);
+                        cl.Margin = new Thickness(10, 0, 0, 0);
+                        cl.HorizontalAlignment= HorizontalAlignment.Left;
+                        _CC.Chat_list.Children.Add(cl);
+                    }
                 }
             }));
         }
@@ -36,44 +54,40 @@ namespace Chat_Server.ViewModel
             
             _CC= cc;
             _TCP_CLient= tcpClient;
-            Send_Btn = new RelayCommand(CanSend, AllwaysTrue);
+
+            Send_Btn = new RelayCommand(CanSend, CanTrue);
             Action ac = new Action(() =>
             {
-                if (tcpClient.str.Count!=0)
-                {
-                    MessageList(tcpClient.str);
-                }
-                Connection(tcpClient.socket);
+                if (_TCP_CLient.str.Count!=0)
+                    MessageList(_TCP_CLient.str);
+                Connection();
             });
             Task t1 = new Task(ac);
             t1.Start();
        
         }
         
-        public void SendUI(string msg)
+        private void SendUI(MessageString msg)
         {
-         //   _CC.Dispatcher.BeginInvoke(new Action(() =>
-         //   {
-                _CC.Dispatcher.Invoke(new Action(() =>
+                _CC.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                     Label lbl= new Label();
-                    lbl.Foreground = new SolidColorBrush(Colors.BlueViolet);
-                     lbl.Content= msg; lbl.HorizontalAlignment = HorizontalAlignment.Right;
+                    Server_Label lbl = new Server_Label(msg.Message);
+                    lbl.Margin = new Thickness(0,0,15,0);
+                      lbl.HorizontalAlignment= HorizontalAlignment.Right;
                     _TCP_CLient.str.Add(msg);
-                    _CC.list_box.Items.Add(lbl);
+                    _CC.Chat_list.Children.Add(lbl);
                     _CC.TXT_BOX.Text = "";
                 }));
-
-         //   }));
         }
 
-        private bool AllwaysTrue(object parametr)
+
+
+        private bool CanTrue(object parametr)
         {
             return _CC.TXT_BOX.Text.Length > 0;
         }
         private void CanSend (object parametr)
         {
-           // MessageBox.Show("a");
             if (_TCP_CLient.socket.Connected)
             {
                
@@ -82,11 +96,13 @@ namespace Chat_Server.ViewModel
                 {
                     var writer = Task.Run(() =>
                     {
+                     
+                       
                           var bytes = Encoding.ASCII.GetBytes(text);
                         _TCP_CLient.socket.Send(bytes);
 
-                        MessageBox.Show(text);
-                        SendUI(text);
+                     //   MessageBox.Show(text);
+                        SendUI(new MessageString(text,true));
                     //    MessageBox.Show(text);
 
 
@@ -96,73 +112,66 @@ namespace Chat_Server.ViewModel
                 catch (Exception)
                 {
 
-                    _TCP_CLient.socket.Shutdown(SocketShutdown.Both);
-                    _TCP_CLient.socket.Close();
+                    //_TCP_CLient.socket.Shutdown(SocketShutdown.Both);
+                    //_TCP_CLient.socket.Close();
                     _CC.Close();
                 }
             }
         }
-        private void Connection(Socket tcp)
+        private void ReadData(Socket tcp)
         {
+            var length = 0;
+            while (IsOKay)
+            {
+                try
+                {
+                    var bytes = new byte[1024];
+                    length = tcp.Receive(bytes);
+                    var msg = Encoding.UTF8.GetString(bytes, 0, length);
+                    MessageBox.Show(msg + "|"+IsOKay.ToString());
+                    _TCP_CLient.str.Add(new MessageString(msg));
+                    _CC.Dispatcher.Invoke(new Action(() =>
+                    {
+                        //MessageBox.Show();
+                        Client_Label cl = new Client_Label(msg);
+                        cl.Margin = new Thickness(10, 0, 0, 0);
+                        cl.HorizontalAlignment = HorizontalAlignment.Left;
+                        _CC.Chat_list.Children.Add(cl);
+                    }));
+                 //   MessageBox.Show(msg);
 
-            //var ip = IPAddress.Loopback;
-            //var port = 27001;
-            //var ep = new IPEndPoint(ip, port);
+                }
+                catch (Exception es)
+                {
+                    MessageBox.Show(es.Message);
+                    IsOKay = false;
+                   
+                }
 
-
+            }
+        }
+        public void CloseTas()
+        {
+            IsOKay= false;
+           
+           // _TCP_CLient.socket.Close();
+            //tas.Dispose();
+       //     MessageBox.Show("Close");
+        }
+        private void Connection()
+        {
             try
             {
-               // tcp.Connect(tcp.RemoteEndPoint);
-            //    _TCP_CLient.Connect(ep);
-               // if (tcp.Connect())
-             //   {
-                    //var writer = Task.Run(() =>
-                    //{
-                    //    while (true)
-                    //    {
-                    //        var text = Console.ReadLine();
-                    //        var stream = _TCP_CLient.GetStream();
-                    //        var bw = new BinaryWriter(stream);
-                    //        bw.Write(text);
-                    //    }
-                    //});
-                    //MessageBox.Show("a");
-                    var reader = Task.Run(() =>
-                    {
-                            var length = 0;
-                       //    tcp.Accept();
-                        while (true)
-                        {
-                            try
-                            {
-                                var bytes = new byte[1024];
-                                length = tcp.Receive(bytes);
-                                var msg = Encoding.UTF8.GetString(bytes, 0, length);
-                                _TCP_CLient.str.Add(msg);
-                                _CC.Dispatcher.Invoke(new Action(() =>
-                                {
-                                    _CC.list_box.Items.Add(msg);
-                                }));
+                task = new Task(() =>
+                {
+                    ReadData(_TCP_CLient.socket);
 
-                            }
-                            catch (Exception es)
-                            {
-
-                              //  MessageBox.Show(es.Message);
-                                //_TCP_CLient.socket.Shutdown(SocketShutdown.Both);
-                               // _TCP_CLient.socket.Close();
-                            }
-           
-                          //  Console.WriteLine($"From Server : {br.ReadString()}");
-                        }
-                    });
-
-                    //Task.WaitAll(reader);
-             //   }
+                });
+                task.Start();
             }
             catch (Exception)
             {
-               
+
             }
 
         }

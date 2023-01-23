@@ -1,9 +1,6 @@
-﻿using Chat_Server.Model;
-using Chat_Server.ViewModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,21 +10,20 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Chat_Server.View
 {
     /// <summary>
-    /// Interaction logic for Chat_Client.xaml
+    /// Interaction logic for Server_Label.xaml
     /// </summary>
-    public partial class Chat_Client : Window
+    public partial class Server_Label : UserControl
     {
-        public ChatViewModel cvm { get; set; }
-        public Chat_Client(ClientConnection clinent)
+        public Server_Label(string msg)
         {
             InitializeComponent();
-            cvm = new ChatViewModel(this, clinent);
-            DataContext = cvm;
+            lbl_txt.Text = msg;
         }
     }
 }
