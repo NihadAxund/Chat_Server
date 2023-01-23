@@ -67,16 +67,28 @@ namespace Chat_Server.ViewModel
        
         }
         
-        private void SendUI(MessageString msg)
+        public void SendUI(MessageString msg)
         {
                 _CC.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    Server_Label lbl = new Server_Label(msg.Message);
-                    lbl.Margin = new Thickness(0,0,15,0);
-                      lbl.HorizontalAlignment= HorizontalAlignment.Right;
-                    _TCP_CLient.str.Add(msg);
-                    _CC.Chat_list.Children.Add(lbl);
-                    _CC.TXT_BOX.Text = "";
+                    if (msg.IsSent)
+                    {
+                        Server_Label lbl = new Server_Label(msg.Message);
+                        lbl.Margin = new Thickness(0,0,15,0);
+                          lbl.HorizontalAlignment= HorizontalAlignment.Right;
+                        _TCP_CLient.str.Add(msg);
+                        _CC.Chat_list.Children.Add(lbl);
+                        _CC.TXT_BOX.Text = "";
+                    }
+                    else
+                    {
+                        Client_Label lbl = new Client_Label(msg.Message);
+                        lbl.Margin = new Thickness(0, 0, 15, 0);
+                        lbl.HorizontalAlignment = HorizontalAlignment.Left;
+                        _TCP_CLient.str.Add(msg);
+                        _CC.Chat_list.Children.Add(lbl);
+                        _CC.TXT_BOX.Text = "";
+                    }
                 }));
         }
 
@@ -114,7 +126,7 @@ namespace Chat_Server.ViewModel
 
                     //_TCP_CLient.socket.Shutdown(SocketShutdown.Both);
                     //_TCP_CLient.socket.Close();
-                    _CC.Close();
+                   // _CC.Close();
                 }
             }
         }
@@ -128,7 +140,7 @@ namespace Chat_Server.ViewModel
                     var bytes = new byte[1024];
                     length = tcp.Receive(bytes);
                     var msg = Encoding.UTF8.GetString(bytes, 0, length);
-                    MessageBox.Show(msg + "|"+IsOKay.ToString());
+             //       MessageBox.Show(msg + "|"+IsOKay.ToString());
                     _TCP_CLient.str.Add(new MessageString(msg));
                     _CC.Dispatcher.Invoke(new Action(() =>
                     {
@@ -141,9 +153,9 @@ namespace Chat_Server.ViewModel
                  //   MessageBox.Show(msg);
 
                 }
-                catch (Exception es)
+                catch (Exception)
                 {
-                    MessageBox.Show(es.Message);
+                  //  MessageBox.Show(es.Message);
                     IsOKay = false;
                    
                 }

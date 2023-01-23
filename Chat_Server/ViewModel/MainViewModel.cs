@@ -31,6 +31,7 @@ namespace Chat_Server.ViewModel
   //      List<TcpClient> Clients {get; set; }    
         private bool Isokay { get; set; } = true;
         private Task t1 { get; set; }
+        private bool IsShowDialog { get; set; } = false;
         static int index = -1;
         public MainViewModel(MainWindow MW) {
             _MW = MW;
@@ -52,9 +53,12 @@ namespace Chat_Server.ViewModel
 
                 index = _MW.Client_Server_list.SelectedIndex;
                  CC = new Chat_Client(uc.TCC);
+                IsShowDialog = true;
                 _MW.Client_Server_list.SelectedIndex = -1;
+
                 if (!CC.ShowDialog().Value)
                 {
+                    IsShowDialog = false;
                     CC.cvm.CloseTas();
                     uc.Badgesi.Visibility= Visibility.Hidden;
                     uc.Badge_Count = 0;
@@ -87,13 +91,9 @@ namespace Chat_Server.ViewModel
                 socket.Listen(10);
                 while (true)
                 {
-                   // var client1 = socket.Accept();
                     var ClientCon = new ClientConnection(socket.Accept());
-                    //       MessageBox.Show($"Listen ever {client.LocalEndPoint}");
                     Task.Run(() =>
                     {
-                 //        MessageBox.Show($"{ClientCon.socket.RemoteEndPoint} connected");
-                          
                         if (index == -1)
                         {
                             ClientConnections.Add(ClientCon);
@@ -101,7 +101,7 @@ namespace Chat_Server.ViewModel
                             var length = 0;
                             var bytes = new byte[1024];
 
-                            lock (ClientCon)
+                         //   lock (ClientCon)
                             {
                                 do
                                 {
@@ -113,15 +113,17 @@ namespace Chat_Server.ViewModel
                                        }
                                        length = ClientCon.socket.Receive(bytes);
                                        var msg = Encoding.UTF8.GetString(bytes, 0, length);
-                                       if (_MW.Client_Server_list.Items[ClientConnections.IndexOf(ClientCon)] is Client_uc uc)
-                                           uc.Badge_Count_inc();
-                                       
+                                       if (IsShowDialog)
+                                       {
+                                            CC.cvm.SendUI(new MessageString(msg));
+                                       }
+                                       else if (_MW.Client_Server_list.Items[ClientConnections.IndexOf(ClientCon)] is Client_uc uc)
+                                           uc.Badge_Count_inc();      
+                                     
                                        ClientCon.str.Add(new MessageString(msg));
-                                       //MessageBox.Show($"Client: {client.RemoteEndPoint}: {msg}");
                                    }
                                    catch (Exception)
                                    {
-                                       // MessageBox.Show(client.RemoteEndPoint.ToString());
                                        int ind = ClientConnections.IndexOf(ClientCon);
                                        ClientCon.socket.Shutdown(SocketShutdown.Both);
                                        ClientCon.socket.Dispose();
@@ -137,7 +139,6 @@ namespace Chat_Server.ViewModel
                         }
                     });
                 }
-                //   socket.Close();
             }
         
         }
