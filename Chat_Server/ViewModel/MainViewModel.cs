@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -38,6 +39,7 @@ namespace Chat_Server.ViewModel
        //      ct = src.Token;
             Start_Stop_Btn = new RelayCommand(CanClick, CanTrue);
             Exit_Btn = new RelayCommand(CanClose, AlwaysTrue);
+           
             _MW.Client_Server_list.SelectionChanged += Client_Server_list_Selected;
         }
         private bool AlwaysTrue(object parametr) => true;
@@ -45,6 +47,9 @@ namespace Chat_Server.ViewModel
         {
             return Isokay;
         }
+
+
+
         private void Client_Server_list_Selected(object sender, RoutedEventArgs e)
         {
             if (_MW.Client_Server_list.SelectedItem is Client_uc uc)
@@ -82,7 +87,7 @@ namespace Chat_Server.ViewModel
         //}
         private  void ConnectionMethod()
         {
-            var idAddres = IPAddress.Loopback;
+            var idAddres = IPAddress.Any;
             var port = 27009;
             using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
             {

@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using static System.Net.Mime.MediaTypeNames;
@@ -54,7 +55,7 @@ namespace Chat_Server.ViewModel
             
             _CC= cc;
             _TCP_CLient= tcpClient;
-
+            _CC.TXT_BOX.KeyUp += TXT_BOX_KeyUp;
             Send_Btn = new RelayCommand(CanSend, CanTrue);
             Action ac = new Action(() =>
             {
@@ -66,7 +67,15 @@ namespace Chat_Server.ViewModel
             t1.Start();
        
         }
-        
+
+        private void TXT_BOX_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                SendData();
+            }
+        }
+
         public void SendUI(MessageString msg)
         {
                 _CC.Dispatcher.BeginInvoke(new Action(() =>
@@ -96,26 +105,26 @@ namespace Chat_Server.ViewModel
 
         private bool CanTrue(object parametr)
         {
-            return _CC.TXT_BOX.Text.Length > 0;
+            return _CC.TXT_BOX.Text.Length > 0&& _CC.TXT_BOX.Text!=" ";
         }
-        private void CanSend (object parametr)
+        private void SendData()
         {
-            if (_TCP_CLient.socket.Connected)
+            if (_TCP_CLient.socket.Connected&& _CC.TXT_BOX.Text.Length > 0 && _CC.TXT_BOX.Text != " ")
             {
-               
+
                 var text = _CC.TXT_BOX.Text;
                 try
                 {
                     var writer = Task.Run(() =>
                     {
-                     
-                       
-                          var bytes = Encoding.ASCII.GetBytes(text);
+
+
+                        var bytes = Encoding.ASCII.GetBytes(text);
                         _TCP_CLient.socket.Send(bytes);
 
-                     //   MessageBox.Show(text);
-                        SendUI(new MessageString(text,true));
-                    //    MessageBox.Show(text);
+                        //   MessageBox.Show(text);
+                        SendUI(new MessageString(text, true));
+                        //    MessageBox.Show(text);
 
 
                     }).Wait(50);
@@ -126,9 +135,13 @@ namespace Chat_Server.ViewModel
 
                     //_TCP_CLient.socket.Shutdown(SocketShutdown.Both);
                     //_TCP_CLient.socket.Close();
-                   // _CC.Close();
+                    // _CC.Close();
                 }
             }
+        }
+        private void CanSend (object parametr)
+        {
+            SendData();
         }
         private void ReadData(Socket tcp)
         {
