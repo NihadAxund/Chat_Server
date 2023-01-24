@@ -1,4 +1,5 @@
-﻿using Chat_Server.Command;
+﻿using Bogus;
+using Chat_Server.Command;
 using Chat_Server.Model;
 using Chat_Server.View;
 using System;
@@ -66,9 +67,11 @@ namespace Chat_Server.ViewModel
         }
         private void  DispatcherMethod(ClientConnection tc)
         {
+            Faker faker= new Faker();
+            
             _MW.Dispatcher.BeginInvoke(new Action(() =>
             {
-                var UC = new Client_uc(tc);
+                var UC = new Client_uc(tc,faker.Person.Avatar,faker.Person.FirstName);
                 _MW.Client_Server_list.Items.Add(UC);
             }));
         }
@@ -92,8 +95,6 @@ namespace Chat_Server.ViewModel
                             DispatcherMethod(ClientCon);
                             var length = 0;
                             var bytes = new byte[1024];
-
-                         //   lock (ClientCon)
                             {
                                 do
                                 {

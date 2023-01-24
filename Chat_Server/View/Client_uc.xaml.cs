@@ -1,4 +1,5 @@
-﻿using Chat_Server.Model;
+﻿using Bogus.DataSets;
+using Chat_Server.Model;
 using Chat_Server.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -39,12 +40,15 @@ namespace Chat_Server.View
                 Badgesi.Badge = Badge_Count.ToString();
             }));
         }
-        public Client_uc(ClientConnection TC)
+        public Client_uc(ClientConnection TC,string ur,string name)
         {
             InitializeComponent();
             Badgesi.Badge = Badge_Count.ToString();
             TCC = TC;
-            Client_Name_txt.Text = TC.socket.RemoteEndPoint.ToString();
+            ImageBrush im  = new ImageBrush();
+            im.ImageSource = new BitmapImage(new Uri(ur));
+            photo.Background = im;
+            Client_Name_txt.Text = name;
         }
 
  

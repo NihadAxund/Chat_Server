@@ -14,11 +14,11 @@
         </Grid.ColumnDefinitions>
         <TextBlock Grid.Column="1" Name="Client_Name_txt" Margin="5,0,0,0" VerticalAlignment="Center" Foreground="White" FontSize="21" FontFamily="Arial Black" >My IP Address</TextBlock>
         <DockPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <Button
+            <Button Name="photo"
                 Style="{StaticResource MaterialDesignFloatingActionLightButton}"
-                ToolTip="MaterialDesignFloatingActionLightButton" BorderBrush="White" Background="#D817D252" Foreground="#DDFFFFFF" FontSize="22">
-                   M
-                </Button  >
+                ToolTip="MaterialDesignFloatingActionLightButton" BorderBrush="White" Background="#D817D252" Foreground="#DDFFFFFF" FontSize="22"/>
+
+
             <materialDesign:Badged Visibility="Hidden" Name="Badgesi" Badge="0" BadgeBackground="#D817D252" Foreground="White" BadgeForeground="#DDFFFFFF" FontSize="25" >
             </materialDesign:Badged>
         </DockPanel>
