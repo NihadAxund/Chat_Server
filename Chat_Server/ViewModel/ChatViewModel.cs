@@ -80,24 +80,24 @@ namespace Chat_Server.ViewModel
         {
                 _CC.Dispatcher.BeginInvoke(new Action(() =>
                 {
+                        _TCP_CLient.str.Add(msg);
                     if (msg.IsSent)
                     {
                         Server_Label lbl = new Server_Label(msg.Message);
                         lbl.Margin = new Thickness(0,0,15,0);
                           lbl.HorizontalAlignment= HorizontalAlignment.Right;
-                        _TCP_CLient.str.Add(msg);
                         _CC.Chat_list.Children.Add(lbl);
-                        _CC.TXT_BOX.Text = "";
                     }
                     else
                     {
                         Client_Label lbl = new Client_Label(msg.Message);
                         lbl.Margin = new Thickness(0, 0, 15, 0);
                         lbl.HorizontalAlignment = HorizontalAlignment.Left;
-                        _TCP_CLient.str.Add(msg);
                         _CC.Chat_list.Children.Add(lbl);
-                        _CC.TXT_BOX.Text = "";
                     }
+                    _CC.TXT_BOX.Text = "";
+                    _CC.Scrollviwer.ScrollToEnd();
+                        
                 }));
         }
 
@@ -153,8 +153,9 @@ namespace Chat_Server.ViewModel
                     var bytes = new byte[1024];
                     length = tcp.Receive(bytes);
                     var msg = Encoding.UTF8.GetString(bytes, 0, length);
-             //       MessageBox.Show(msg + "|"+IsOKay.ToString());
                     _TCP_CLient.str.Add(new MessageString(msg));
+                    if (!IsOKay) { return; }
+             //       MessageBox.Show(msg + "|"+IsOKay.ToString());
                     _CC.Dispatcher.Invoke(new Action(() =>
                     {
                         //MessageBox.Show();
@@ -162,6 +163,7 @@ namespace Chat_Server.ViewModel
                         cl.Margin = new Thickness(10, 0, 0, 0);
                         cl.HorizontalAlignment = HorizontalAlignment.Left;
                         _CC.Chat_list.Children.Add(cl);
+                        _CC.Scrollviwer.ScrollToEnd();
                     }));
                  //   MessageBox.Show(msg);
 
@@ -169,7 +171,7 @@ namespace Chat_Server.ViewModel
                 catch (Exception)
                 {
                   //  MessageBox.Show(es.Message);
-                    IsOKay = false;
+                  //  IsOKay = false;
                    
                 }
 
@@ -178,10 +180,6 @@ namespace Chat_Server.ViewModel
         public void CloseTas()
         {
             IsOKay= false;
-           
-           // _TCP_CLient.socket.Close();
-            //tas.Dispose();
-       //     MessageBox.Show("Close");
         }
         private void Connection()
         {

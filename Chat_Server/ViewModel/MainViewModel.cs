@@ -28,8 +28,7 @@ namespace Chat_Server.ViewModel
         Chat_Client CC { get; set; } 
         public RelayCommand Start_Stop_Btn { get; set; }
         public RelayCommand Exit_Btn { get; set; }
-        public List<ClientConnection> ClientConnections = new List<ClientConnection>();
-  //      List<TcpClient> Clients {get; set; }    
+        public List<ClientConnection> ClientConnections = new List<ClientConnection>();    
         private bool Isokay { get; set; } = true;
         private Task t1 { get; set; }
         private bool IsShowDialog { get; set; } = false;
@@ -43,13 +42,7 @@ namespace Chat_Server.ViewModel
             _MW.Client_Server_list.SelectionChanged += Client_Server_list_Selected;
         }
         private bool AlwaysTrue(object parametr) => true;
-        private bool CanTrue(object parametr)
-        {
-            return Isokay;
-        }
-
-
-
+        private bool CanTrue(object parametr) => Isokay;
         private void Client_Server_list_Selected(object sender, RoutedEventArgs e)
         {
             if (_MW.Client_Server_list.SelectedItem is Client_uc uc)
@@ -63,12 +56,11 @@ namespace Chat_Server.ViewModel
 
                 if (!CC.ShowDialog().Value)
                 {
+                    index = -1;
                     IsShowDialog = false;
                     CC.cvm.CloseTas();
                     uc.Badgesi.Visibility= Visibility.Hidden;
                     uc.Badge_Count = 0;
-                    index = -1;
-                    MessageBox.Show("Exit");
                 }
             }
         }
@@ -80,11 +72,6 @@ namespace Chat_Server.ViewModel
                 _MW.Client_Server_list.Items.Add(UC);
             }));
         }
-        //private void AgainSend(Socket socke,string msg)
-        //{
-        //    var bytes = Encoding.ASCII.GetBytes(msg);
-        //    socke.Send(bytes);
-        //}
         private  void ConnectionMethod()
         {
             var idAddres = IPAddress.Any;
