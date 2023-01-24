@@ -171,7 +171,7 @@ namespace Chat_Server.ViewModel
                 catch (Exception)
                 {
                   //  MessageBox.Show(es.Message);
-                  //  IsOKay = false;
+                   IsOKay = false;
                    
                 }
 
